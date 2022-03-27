@@ -5,11 +5,4 @@ spring:
 spotify-api:
   client-id: ${SPOTIFY_CLIENT_ID}
   client-secret: ${SPOTIFY_CLIENT_SECRET}
-  search:
-    track:
-      url: https://api.spotify.com/v1/search?type=track
-  user:
-    playlists:
-      url: https://api.spotify.com/v1/me/playlists
-    profile:
-      url: https://api.spotify.com/v1/me
+  urls: https://api.spotify.com/v1

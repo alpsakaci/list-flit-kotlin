@@ -19,7 +19,7 @@ class OAuth2Config(
     val spotifyClientSecret: String
 ) : WebSecurityConfigurerAdapter() {
 
-    private val PUBLIC_MATCHERS = arrayOf(
+    private val publicMatchers = arrayOf(
         "/",
         "/css/**",
         "/js/**",
@@ -29,7 +29,7 @@ class OAuth2Config(
     override fun configure(http: HttpSecurity) {
         http
             .cors().and().csrf().disable()
-            .authorizeRequests().antMatchers(*PUBLIC_MATCHERS).permitAll()
+            .authorizeRequests().antMatchers(*publicMatchers).permitAll()
             .anyRequest().authenticated()
             .and()
             .oauth2Login()

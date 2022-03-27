@@ -17,5 +17,4 @@ class IndexController {
         response.setHeader("Cache-Control", "no-cache")
         return RedirectView("/swagger-ui/index.html")
     }
-
 }
