@@ -1,6 +1,6 @@
 package com.alpsakaci.listflit.infrastructure.httpclient.spotify
 
-import com.alpsakaci.listflit.infrastructure.httpclient.spotify.request.CreatePlaylist
+import com.alpsakaci.listflit.infrastructure.httpclient.spotify.request.CreatePlaylistRequest
 import com.alpsakaci.listflit.infrastructure.httpclient.spotify.request.TrackURIs
 import com.alpsakaci.listflit.infrastructure.httpclient.spotify.response.GetPlaylistsResponse
 import com.alpsakaci.listflit.infrastructure.httpclient.spotify.response.GetUserResponse
@@ -22,7 +22,7 @@ interface SpotifyApiClient {
     fun getUserPlaylists(): GetPlaylistsResponse
 
     @PostMapping("/me/playlists")
-    fun createPlaylist(playlist: CreatePlaylist): Any
+    fun createPlaylist(playlist: CreatePlaylistRequest): Any
 
     @PostMapping("/playlists/{playlistId}/tracks")
     fun addTracksToPlaylist(@PathVariable("playlistId") playlistId: String, uris: TrackURIs): Any

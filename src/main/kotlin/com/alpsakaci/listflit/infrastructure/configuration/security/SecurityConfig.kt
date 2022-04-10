@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.oauth2.client.registration.ClientRegistration
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter
 import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
@@ -19,9 +20,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 class SecurityConfig(
-    @Value("\${spotify-api.client-id}")
+    @Value("\${spotify.client-id}")
     val spotifyClientId: String,
-    @Value("\${spotify-api.client-secret}")
+    @Value("\${spotify.client-secret}")
     val spotifyClientSecret: String
 ) : WebSecurityConfigurerAdapter() {
 
@@ -42,12 +43,16 @@ class SecurityConfig(
                 .anyRequest().authenticated()
             }
             .oauth2Login()
+            .authorizationEndpoint()
+            .authorizationRequestResolver(AuthorizationRequestResolver(clientRegistrationRepository(), OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI))
+            .and()
+            .defaultSuccessUrl("/", true)
             .and()
             .logout{ l -> l
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
+                .deleteCookies("JSESSIONID")
                 .logoutSuccessUrl("/")
-                .deleteCookies()
                 .permitAll()
                 .and()
                 .csrf()
@@ -72,7 +77,7 @@ class SecurityConfig(
     }
 
     @Bean
-    fun clientRegistrationRepository(): ClientRegistrationRepository? {
+    fun clientRegistrationRepository(): ClientRegistrationRepository {
         return InMemoryClientRegistrationRepository(spotifyClientRegistration())
     }
 

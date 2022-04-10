@@ -20,6 +20,6 @@ feign:
         connectTimeout: 1000
         readTimeout: 1000
 
-spotify-api:
+spotify:
   client-id: ${SPOTIFY_CLIENT_ID}
   client-secret: ${SPOTIFY_CLIENT_SECRET}
