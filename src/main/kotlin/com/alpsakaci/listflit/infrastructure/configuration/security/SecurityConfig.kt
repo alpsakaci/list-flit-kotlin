@@ -56,8 +56,7 @@ class SecurityConfig(
                 .permitAll()
                 .and()
                 .csrf()
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .ignoringAntMatchers("/logout/**")
+                .disable()
             }
             .cors()
             .configurationSource(configurationSource())

@@ -23,6 +23,7 @@ class IndexController {
     }
 
     @GetMapping("/user")
+    @Hidden
     @Parameter(
         name = "principle",
         hidden = true
