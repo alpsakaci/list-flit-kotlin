@@ -2,7 +2,24 @@ spring:
   main:
     allow-circular-references: true
 
+feign:
+  client:
+    config:
+      default:
+        connection-timeout: 1000
+        read-timeout: 1000
+        logger-level: full
+      github-api:
+        name: github-api
+        url: https://api.github.com
+        connectTimeout: 1000
+        readTimeout: 1000
+      spotify-api:
+        name: twitter-api
+        url: https://api.spotify.com/v1
+        connectTimeout: 1000
+        readTimeout: 1000
+
 spotify-api:
   client-id: ${SPOTIFY_CLIENT_ID}
   client-secret: ${SPOTIFY_CLIENT_SECRET}
-  urls: https://api.spotify.com/v1

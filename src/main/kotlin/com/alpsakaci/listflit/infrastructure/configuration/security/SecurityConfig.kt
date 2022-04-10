@@ -1,8 +1,9 @@
-package com.alpsakaci.listflit.infrastructure.configuration.oauth
+package com.alpsakaci.listflit.infrastructure.configuration.security
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.oauth2.client.registration.ClientRegistration
@@ -10,9 +11,14 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository
 import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+
 
 @Configuration
-class OAuth2Config(
+class SecurityConfig(
     @Value("\${spotify-api.client-id}")
     val spotifyClientId: String,
     @Value("\${spotify-api.client-secret}")
@@ -21,18 +27,48 @@ class OAuth2Config(
 
     private val publicMatchers = arrayOf(
         "/",
+        "/error",
         "/css/**",
         "/js/**",
-        "/img/**")
+        "/img/**",
+        "/webjars/**"
+    )
 
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
         http
-            .cors().and().csrf().disable()
-            .authorizeRequests().antMatchers(*publicMatchers).permitAll()
-            .anyRequest().authenticated()
-            .and()
+            .authorizeRequests { a -> a
+                .antMatchers(*publicMatchers).permitAll()
+                .anyRequest().authenticated()
+            }
             .oauth2Login()
+            .and()
+            .logout{ l -> l
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .logoutSuccessUrl("/")
+                .deleteCookies()
+                .permitAll()
+                .and()
+                .csrf()
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .ignoringAntMatchers("/logout/**")
+            }
+            .cors()
+            .configurationSource(configurationSource())
+    }
+
+    fun configurationSource(): CorsConfigurationSource {
+        val source = UrlBasedCorsConfigurationSource()
+        val config = CorsConfiguration()
+        config.addAllowedOrigin("*")
+        config.allowCredentials = true
+        config.addAllowedHeader("X-Requested-With")
+        config.addAllowedHeader("Content-Type")
+        config.addAllowedMethod(HttpMethod.POST)
+        source.registerCorsConfiguration("/logout", config);
+
+        return source
     }
 
     @Bean
@@ -48,6 +84,7 @@ class OAuth2Config(
             .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
             .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
             .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
+            // TODO: Add scopes
             .scope("user-library-read", "playlist-modify-public", "playlist-modify-private")
             .authorizationUri("https://accounts.spotify.com/authorize")
             .tokenUri("https://accounts.spotify.com/api/token")
