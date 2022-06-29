@@ -9,11 +9,6 @@ feign:
         connection-timeout: 1000
         read-timeout: 1000
         logger-level: full
-      github-api:
-        name: github-api
-        url: https://api.github.com
-        connectTimeout: 1000
-        readTimeout: 1000
       spotify-api:
         name: twitter-api
         url: https://api.spotify.com/v1
