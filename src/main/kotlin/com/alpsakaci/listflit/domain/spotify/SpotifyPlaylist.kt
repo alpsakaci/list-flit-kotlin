@@ -1,6 +1,6 @@
-package com.alpsakaci.listflit.infrastructure.httpclient.spotify.response
+package com.alpsakaci.listflit.domain.spotify
 
-data class PlaylistResponse(
+data class SpotifyPlaylist(
     var id: String,
     var href: String,
     var name: String,

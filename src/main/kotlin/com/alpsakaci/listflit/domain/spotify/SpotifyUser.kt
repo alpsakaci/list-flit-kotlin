@@ -1,6 +1,6 @@
-package com.alpsakaci.listflit.infrastructure.httpclient.spotify.response
+package com.alpsakaci.listflit.domain.spotify
 
-data class GetUserResponse(
+data class SpotifyUser(
     val display_name: String,
     val external_urls: Any,
     val followers: Any,

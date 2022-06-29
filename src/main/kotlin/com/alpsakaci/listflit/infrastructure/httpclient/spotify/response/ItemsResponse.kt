@@ -1,8 +1,8 @@
 package com.alpsakaci.listflit.infrastructure.httpclient.spotify.response
 
-data class TrackResponse(
+data class ItemsResponse<T>(
     val href: String?,
-    val items: ArrayList<SpotifyTrack>,
+    val items: ArrayList<T>,
     val limit: Int,
     val next: String?,
     val offset: Int,

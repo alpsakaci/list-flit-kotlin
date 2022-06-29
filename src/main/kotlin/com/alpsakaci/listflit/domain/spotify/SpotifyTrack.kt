@@ -1,4 +1,4 @@
-package com.alpsakaci.listflit.infrastructure.httpclient.spotify.response
+package com.alpsakaci.listflit.domain.spotify
 
 data class SpotifyTrack(
     val artists: Any,
