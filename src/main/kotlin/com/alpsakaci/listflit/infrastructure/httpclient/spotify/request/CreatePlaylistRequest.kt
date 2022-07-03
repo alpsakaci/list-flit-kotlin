@@ -4,5 +4,5 @@ data class CreatePlaylistRequest(
     val name: String,
     val public: Boolean,
     val collaborative: Boolean,
-    val description: String
+    val description: String?
 )
