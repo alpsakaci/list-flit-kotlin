@@ -1,6 +1,7 @@
 package com.alpsakaci.listflit.application.command
 
 import com.alpsakaci.listflit.application.query.GetSpotifyTrackQuery
+import com.alpsakaci.listflit.application.util.Partition
 import com.alpsakaci.listflit.domain.applemusic.AppleMusicTrack
 import com.alpsakaci.listflit.domain.spotify.SpotifyTrack
 import com.alpsakaci.listflit.infrastructure.httpclient.spotify.SpotifyApiClient
@@ -36,8 +37,9 @@ class MigratePlaylistFromAppleMusicToSpotifyCommandHandler(
 
         }
 
-        val addTracksRequest = createAddTracksRequest(spotifyPlaylistItems)
-        if (addTracksRequest.uris.isNotEmpty()) {
+        val addTracksRequests = createAddTracksRequests(spotifyPlaylistItems)
+
+        for (addTracksRequest in addTracksRequests) {
             spotifyApiClient.addTracksToPlaylist(spotifyPlaylist.id, addTracksRequest)
         }
     }
@@ -46,12 +48,30 @@ class MigratePlaylistFromAppleMusicToSpotifyCommandHandler(
         return GetSpotifyTrackQuery(track.name+ " " + track.artist + " " + track.album)
     }
 
-    private fun createAddTracksRequest(spotifyPlaylistItems: List<SpotifyTrack>): AddTracksRequest {
-        val uris: ArrayList<String> = ArrayList(spotifyPlaylistItems.size)
-        spotifyPlaylistItems.forEach{
+    private fun convertSpotifyTracksToAddTracksRequest(spotifyTracks: List<SpotifyTrack>): AddTracksRequest {
+        val uris: ArrayList<String> = ArrayList(spotifyTracks.size)
+        spotifyTracks.forEach{
             uris.add(it.uri)
         }
-
         return AddTracksRequest(uris)
+    }
+
+    private fun createAddTracksRequests(spotifyPlaylistItems: List<SpotifyTrack>): List<AddTracksRequest> {
+        val requests = mutableListOf<AddTracksRequest>()
+
+        if (spotifyPlaylistItems.size > 100) {
+            val partitions = Partition.ofSize(spotifyPlaylistItems, 100)
+            for (partition in partitions) {
+                val request = convertSpotifyTracksToAddTracksRequest(partition as List<SpotifyTrack>)
+                requests.add(request)
+            }
+
+            return requests
+        }
+
+        val request = convertSpotifyTracksToAddTracksRequest(spotifyPlaylistItems)
+        requests.add(request)
+
+        return requests
     }
 }
