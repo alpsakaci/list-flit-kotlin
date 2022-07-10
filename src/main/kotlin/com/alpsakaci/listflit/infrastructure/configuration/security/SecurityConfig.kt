@@ -12,7 +12,6 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter
 import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
@@ -46,7 +45,7 @@ class SecurityConfig(
             .authorizationEndpoint()
             .authorizationRequestResolver(AuthorizationRequestResolver(clientRegistrationRepository(), OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI))
             .and()
-            .defaultSuccessUrl("/", true)
+            .defaultSuccessUrl("/uploadLibrary", true)
             .and()
             .logout{ l -> l
                 .invalidateHttpSession(true)
