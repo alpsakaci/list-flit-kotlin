@@ -168,9 +168,20 @@
 		integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
 		crossorigin="anonymous"></script>
 	<script src="js/getUserProfile.js"></script>
-	<script src="js/musicLibrary.js"></script>
 	<script src="js/tableSearch.js"></script>
 	<script th:inline="javascript">
+		function getCheckedPlaylistIds() {
+			var items = [];
+			var playlistCheckboxes = document.querySelectorAll('.playlist-check');
+			for (var i = 0; i < playlistCheckboxes.length; i++) {
+				if (playlistCheckboxes[i].checked == true) {
+					items.push(playlistCheckboxes[i].id);
+				}
+			}
+
+			return items;
+		}
+
 		function getCheckedPlaylists(playlistIds) {
 			var items = [];
 			/*<![CDATA[*/
@@ -189,6 +200,36 @@
 			/*]]>*/
 		}
 
+		function getCheckedTrackIds() {
+			var items = [];
+			var trackCheckboxes = document.querySelectorAll('.track-check');
+			for (var i = 0; i < trackCheckboxes.length; i++) {
+				if (trackCheckboxes[i].checked == true) {
+					items.push(trackCheckboxes[i].id);
+				}
+			}
+
+			return items;
+		}
+
+		function getCheckedTracks(trackIds) {
+			var items = [];
+			/*<![CDATA[*/
+			var tracks = [[${ tracks }]];
+
+			for (var i = 0; i < trackIds.length; i++) {
+				for (var j = 0; j < tracks.length; j++) {
+					if (trackIds[i] == tracks[j].id) {
+						items.push(tracks[j]);
+						continue;
+					}
+				}
+			}
+
+			return items;
+			/*]]>*/
+		}
+
 		function importPlaylists() {
 			var startTime = performance.now();
 			var loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'), {
@@ -196,25 +237,32 @@
 			});
 			
 			/*<![CDATA[*/
-			var tracks = [[${ tracks }]];
+
 
 			var checkedPlaylistIds = getCheckedPlaylistIds();
 			var playlists = getCheckedPlaylists(checkedPlaylistIds);
-			
-			var singlesPlaylist = getSinglesList();
-			if (singlesPlaylist != null) {
-				playlists.push(singlesPlaylist);	
+
+			var checkedTracksIds = getCheckedTrackIds();
+			var checkedTracks = getCheckedTracks(checkedTracksIds);
+			if (checkedTracks.length > 0) {
+				var singlesPlaylist = {
+					"id": -1,
+					"name": "Single",
+					"description" : null,
+					"items": {}
+				}
+				for (var i = 0; i < checkedTracks.length; i++) {
+					singlesPlaylist.items[checkedTracks[i].id] = checkedTracks[i]
+				}
+				playlists.push(singlesPlaylist);
 			}
-			
+
 			for (var i = 0; i < playlists.length; i++) {
-				var payload = {
-					"tracks": tracks,
-					"playlist": playlists[i]
-				};
+				var payload = playlists[i];
 				console.log(payload);
 				$.ajax({
 					type: "POST",
-					url: "/library/importPlaylist",
+					url: "/v1/importPlaylist",
 					contentType: "application/json; charset=utf-8",
 					data: JSON.stringify(payload),
 					beforeSend : function (){
