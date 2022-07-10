@@ -1,7 +1,6 @@
 package com.alpsakaci.listflit.infrastructure.controller
 
-import com.alpsakaci.listflit.domain.applemusic.AppleMusicPlaylist
-import com.alpsakaci.listflit.domain.applemusic.AppleMusicTrack
+import com.alpsakaci.listflit.application.service.LibraryParseService
 import com.alpsakaci.listflit.infrastructure.controller.response.UserResponse
 import io.swagger.v3.oas.annotations.Hidden
 import io.swagger.v3.oas.annotations.Parameter
@@ -19,7 +18,9 @@ import javax.servlet.http.HttpServletResponse
 
 @Controller
 @RequestMapping("/")
-class IndexController {
+class IndexController(
+    val libraryParseService: LibraryParseService
+) {
 
     @GetMapping
     fun login(): String {
@@ -33,18 +34,9 @@ class IndexController {
 
     @PostMapping("/uploadLibrary")
     fun handleLibraryUpload(@RequestParam("libraryFile") file: MultipartFile, model: Model): String {
-        model.addAttribute("playlists", listOf(
-            AppleMusicPlaylist(1, "testPlaylist1", null, hashMapOf(
-                Pair(1, AppleMusicTrack(1, "testName1", "testArtist1", "testAlbum1")),
-                Pair(2, AppleMusicTrack(2, "testName2", "testArtist2", "testAlbum2")),
-                Pair(3, AppleMusicTrack(3, "testName3", "testArtist3", "testAlbum3"))
-            ))
-        ))
-        model.addAttribute("tracks", listOf(
-            AppleMusicTrack(1, "testName1", "testArtist1", "testAlbum1"),
-            AppleMusicTrack(2, "testName2", "testArtist2", "testAlbum2"),
-            AppleMusicTrack(3, "testName3", "testArtist3", "testAlbum3")
-        ))
+        val library = libraryParseService.parseLibrary(file)
+		model.addAttribute("playlists", library.playlists);
+		model.addAttribute("tracks", library.tracks);
 
         return "library"
     }

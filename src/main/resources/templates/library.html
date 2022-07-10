@@ -75,7 +75,7 @@
 													type="checkbox" th:name="${playlist.id}"
 													th:id="${playlist.id}" /></th>
 												<td th:text="${playlist.name}"></td>
-												<td th:text="${#lists.size(playlist.items)}"></td>
+												<td th:text="${#maps.size(playlist.items)}"></td>
 											</tr>
 										</tbody>
 									</table>
